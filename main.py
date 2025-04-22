@@ -6,8 +6,8 @@ session = requests.Session()
 login = session.post(
     "https://absenpkl.stmbksimo.com/sw-proses?action=login",
     files={
-        "email": ("", "13636@gmail.com"),
-        "password": ("", "13636")
+        "email": ("13636@gmail.com"),
+        "password": ("13636")
     },
     headers={
         "X-Requested-With": "XMLHttpRequest",
