@@ -13,7 +13,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Jalankan script absen.sh
+      - name: Jalankan script absen.sh (bagas)
         run: |
           chmod +x absen.sh
           ./absen.sh
+
+
+      - name: Jalankan script absen2.sh (agung)
+        run: |
+          chmod +x absen2.sh
+          ./absen2.sh
