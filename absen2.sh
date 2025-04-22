@@ -33,4 +33,4 @@ else
 fi
 
 # Bersihkan file cookie
-rm "$COOKIE_FILE
+rm "$COOKIE_FILE"
