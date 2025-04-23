@@ -1,4 +1,4 @@
-name: Cron Job Example
+name: Absen PKL Pagi
 
 # +-------------------------------------------+
 # |          GitHub Actions Cron Job          |
@@ -32,16 +32,16 @@ jobs:
         uses: actions/checkout@v3
 
       # Add your job steps here
-      - name: Run Your Cron Job
+      - name: Absen 1
         run: |
-          echo "Running cron job"
+          echo "Running absen 1"
           # Add your actual cron job commands here
           chmod +x absen.sh
           ./absen.sh
 
-      - name: Run Your Cron Job
+      - name: Absen 2
         run: |
-          echo "Running cron job"
+          echo "Running absen 2"
           # Add your actual cron job commands here
           chmod +x absen2.sh
           ./absen2.sh
