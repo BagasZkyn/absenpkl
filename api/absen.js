@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       },
       body: new URLSearchParams({
         email: '13636@gmail.com',
-        password: '1366'
+        password: '13636'
       })
     });
 
