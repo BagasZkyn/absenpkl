@@ -2,16 +2,16 @@ const accounts = [
   {
     name: "Bagas Zakyan",
     email: "13636@gmail.com",
-    endpoint: "/api/absen"
+    endpoint: "/api/bagas"
   },
   {
     name: "M Agung",
     email: "13648@gmail.com",
-    endpoint: "/api/absen2"
+    endpoint: "/api/agung"
   },
   {
     name: "M Fahmi",
-    email: "13687",
+    email: "13687@gmail.com",
     endpoint: "/api/fahmi"
   }
 ];
