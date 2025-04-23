@@ -2,12 +2,12 @@ const accounts = [
   {
     name: "Nathan Kanaeru",
     email: "13636@gmail.com",
-    endpoint: "/api/absen-nathan"
+    endpoint: "/api/absen"
   },
   {
     name: "Rizky Pratama",
-    email: "rizky@gmail.com",
-    endpoint: "/api/absen-rizky"
+    email: "13648@gmail.com",
+    endpoint: "/api/absen2"
   }
 ];
 
