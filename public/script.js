@@ -1,13 +1,18 @@
 const accounts = [
   {
-    name: "Nathan Kanaeru",
+    name: "Bagas Zakyan",
     email: "13636@gmail.com",
     endpoint: "/api/absen"
   },
   {
-    name: "Rizky Pratama",
+    name: "M Agung",
     email: "13648@gmail.com",
     endpoint: "/api/absen2"
+  },
+  {
+    name: "M Fahmi",
+    email: "13687",
+    endpoint: "/api/fahmi"
   }
 ];
 
