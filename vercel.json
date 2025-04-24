@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/pages/index.html"
+      "destination": "/public/index.html"
     }
   ],
   "cleanUrls": true,
