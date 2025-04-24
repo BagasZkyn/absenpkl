@@ -42,9 +42,9 @@ async function getCronStatus(cronId, apiKey) {
 
     const data = await response.json();
     
-    if (!data?.job) {
-      console.error('Response tidak valid:', data);
-      throw new Error('Struktur response API tidak valid');
+    if (!data || typeof data !== 'object' || !data.job) {
+      console.error('Invalid API structure:', data);
+      throw new Error('Invalid API response structure');
     }
 
     return data;
