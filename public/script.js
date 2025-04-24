@@ -5,28 +5,41 @@ const accounts = [
     name: "Bagas Zakyan",
     email: "13636@gmail.com",
     endpoint: "/api/bagas",
-    cron: { jobId: "6056513", apiKey: CRON_API_KEY }
+    cron: {
+      jobId: "6056513",
+      apiKey: CRON_API_KEY // Mengambil dari config.js
+    }
   },
   {
     name: "M Agung",
     email: "13648@gmail.com",
     endpoint: "/api/agung",
-    cron: { jobId: "6056513", apiKey: CRON_API_KEY }
+    cron: {
+      jobId: "6056513", 
+      apiKey: CRON_API_KEY
+    }
   },
   {
     name: "M Fahmi",
     email: "13687@gmail.com",
     endpoint: "/api/fahmi",
-    cron: { jobId: "6056513", apiKey: CRON_API_KEY }
+    cron: {
+      jobId: "6056513",
+      apiKey: CRON_API_KEY
+    }
   },
   {
     name: "Andika Surya",
     email: "13666@gmail.com",
     endpoint: "/api/surya",
-    cron: { jobId: "6056513", apiKey: CRON_API_KEY }
+    cron: {
+      jobId: "6056513",
+      apiKey: CRON_API_KEY
+    }
   }
 ];
 
+// Fungsi untuk mendapatkan status cron
 async function getCronStatus(cronId, apiKey) {
   try {
     const response = await fetch(`${CRON_API_URL}/jobs/${cronId}`, {
@@ -40,15 +53,22 @@ async function getCronStatus(cronId, apiKey) {
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
     const data = await response.json();
-    if (!data?.jobDetails) throw new Error('Struktur response API tidak valid');
+    
+    if (!data?.jobDetails) {
+      console.error('Response tidak valid:', data);
+      throw new Error('Struktur response API tidak valid');
+    }
+
     return data;
 
   } catch (error) {
+    console.error('Error API:', error);
     showToast(error.message, 'error');
     return null;
   }
 }
 
+// Fungsi update cron job
 async function updateCronJob(jobId, apiKey, updateData) {
   try {
     const response = await fetch(`${CRON_API_URL}/jobs/${jobId}`, {
@@ -60,13 +80,17 @@ async function updateCronJob(jobId, apiKey, updateData) {
       body: JSON.stringify(updateData)
     });
 
+    if (response.status === 401) throw new Error('API Key tidak valid');
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
     return await response.json();
   } catch (error) {
+    console.error('Update error:', error);
     throw error;
   }
 }
 
+// Fungsi tampilkan notifikasi
 function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white ${
@@ -75,6 +99,7 @@ function showToast(message, type = 'info') {
   }`;
   toast.textContent = message;
   document.body.appendChild(toast);
+
   setTimeout(() => toast.remove(), 5000);
 }
 
@@ -82,9 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("account-list");
   const icons = ['fa-user-graduate', 'fa-user-tie', 'fa-user-ninja'];
 
+  // Render kartu akun
   accounts.forEach((acc, index) => {
     const card = document.createElement("div");
     card.className = "bg-white rounded-2xl border-2 border-indigo-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer p-8 group hover:-translate-y-2 transform-gpu";
+    
     const randomIcon = icons[index % icons.length];
     
     card.innerHTML = `
@@ -104,25 +131,31 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    let originalHTML = card.innerHTML;
     let loading = false;
+
     card.onclick = async () => {
       if (loading) return;
       loading = true;
       
       try {
         card.querySelector('i').className = 'fas fa-spinner fa-spin';
+
         const [endpointRes, cronData] = await Promise.all([
           fetch(acc.endpoint).then(res => res.text()),
           getCronStatus(acc.cron.jobId, acc.cron.apiKey)
         ]);
 
+        // Update dialog content
         document.getElementById("dialog-title").textContent = acc.name;
         document.getElementById("dialog-email").textContent = `Email: ${acc.email}`;
         document.getElementById("dialog-last").textContent = endpointRes;
 
+        // Update cron status
         const statusContainer = document.getElementById("cron-status-container");
         if (cronData?.jobDetails) {
           const job = cronData.jobDetails;
+          
           statusContainer.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
               <div class="p-4 bg-white rounded-lg col-span-2">
@@ -144,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="flex items-center justify-between mt-2">
                   <span class="text-sm text-gray-600">Next Run: ${new Date(job.nextExecution * 1000).toLocaleString()}</span>
                   <button 
-                    onclick="openScheduleEditor('${acc.cron.jobId}', '${acc.cron.apiKey}', ${JSON.stringify(job.schedule)})" 
+                    onclick="openScheduleEditor('${acc.cron.jobId}', '${acc.cron.apiKey}', ${JSON.stringify(job.schedule.hours)})" 
                     class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg"
                   >
                     <i class="fas fa-edit mr-2"></i>Edit Jadwal
@@ -154,20 +187,21 @@ document.addEventListener("DOMContentLoaded", () => {
               
               <div class="p-4 bg-white rounded-lg">
                 <div class="flex items-center mb-2">
-                  <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
-                  <span class="font-semibold">Hari Kerja</span>
+                  <i class="fas fa-clock text-blue-500 mr-2"></i>
+                  <span class="font-semibold">Jadwal Saat Ini</span>
                 </div>
-                <p class="text-sm text-gray-600">Senin - Jumat</p>
+                <p class="text-sm text-gray-600">
+                  ${job.schedule.hours.map(h => `${h}:00`).join(', ')}
+                </p>
               </div>
               
               <div class="p-4 bg-white rounded-lg">
                 <div class="flex items-center mb-2">
-                  <i class="fas fa-clock text-blue-500 mr-2"></i>
-                  <span class="font-semibold">Jam Absen</span>
+                  <i class="fas fa-history text-purple-500 mr-2"></i>
+                  <span class="font-semibold">Terakhir Dieksekusi</span>
                 </div>
                 <p class="text-sm text-gray-600">
-                  Pagi: ${job.schedule.hours[0]}:${String(job.schedule.minutes[0]).padStart(2, '0')}<br>
-                  Sore: ${job.schedule.hours[1]}:${String(job.schedule.minutes[1]).padStart(2, '0')}
+                  ${job.lastExecution ? new Date(job.lastExecution * 1000).toLocaleString() : 'Belum pernah'}
                 </p>
               </div>
             </div>
@@ -186,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
     list.appendChild(card);
   });
 
+  // Handle toggle status
   document.addEventListener('click', async (e) => {
     if (e.target.id === 'toggle-cron-status') {
       const jobId = e.target.dataset.jobId;
@@ -193,9 +228,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentStatus = e.target.dataset.currentStatus === 'true';
       
       try {
-        await updateCronJob(jobId, apiKey, { job: { enabled: !currentStatus } });
-        showToast('Status berhasil diupdate!', 'success');
-        setTimeout(() => location.reload(), 1000);
+        const result = await updateCronJob(jobId, apiKey, {
+          job: { enabled: !currentStatus }
+        });
+        
+        if (result) {
+          showToast('Status berhasil diupdate!', 'success');
+          setTimeout(() => location.reload(), 1000); // Refresh data
+        }
       } catch (error) {
         showToast(`Error: ${error.message}`, 'error');
       }
@@ -203,47 +243,47 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function openScheduleEditor(jobId, apiKey, currentSchedule) {
+// Fungsi edit jadwal
+function openScheduleEditor(jobId, apiKey, currentHours) {
   document.getElementById('edit-jobId').value = jobId;
   document.getElementById('edit-apiKey').value = apiKey;
   
   const form = document.getElementById('schedule-form');
-  form.elements['morning-hour'].value = currentSchedule.hours[0] || 7;
-  form.elements['morning-minute'].value = currentSchedule.minutes[0] || 0;
-  form.elements['afternoon-hour'].value = currentSchedule.hours[1] || 16;
-  form.elements['afternoon-minute'].value = currentSchedule.minutes[1] || 0;
+  form.elements.morning.value = currentHours[0];
+  form.elements.afternoon.value = currentHours[1];
   
   document.getElementById('schedule-dialog').showModal();
 }
 
+// Handle form submit
 document.getElementById('schedule-form').onsubmit = async (e) => {
   e.preventDefault();
   
   const formData = new FormData(e.target);
+  const jobId = formData.get('jobId');
+  const apiKey = formData.get('apiKey');
+  const morning = formData.get('morning');
+  const afternoon = formData.get('afternoon');
+
   const schedule = {
     timezone: 'Asia/Jakarta',
-    minutes: [
-      parseInt(formData.get('morning-minute')),
-      parseInt(formData.get('afternoon-minute'))
-    ],
-    hours: [
-      parseInt(formData.get('morning-hour')),
-      parseInt(formData.get('afternoon-hour'))
-    ],
-    mdows: [1,2,3,4,5],
+    minutes: [0],
+    hours: [parseInt(morning), parseInt(afternoon)],
+    mdows: [-1],
     months: [-1],
     mdays: [-1]
   };
 
   try {
-    await updateCronJob(
-      formData.get('jobId'),
-      formData.get('apiKey'),
-      { job: { schedule }
-    );
-    document.getElementById('schedule-dialog').close();
-    showToast('Jadwal berhasil diupdate!', 'success');
-    setTimeout(() => location.reload(), 1000);
+    const result = await updateCronJob(jobId, apiKey, {
+      job: { schedule }
+    });
+    
+    if (result) {
+      document.getElementById('schedule-dialog').close();
+      showToast('Jadwal berhasil diupdate!', 'success');
+      setTimeout(() => location.reload(), 1000); // Refresh data
+    }
   } catch (error) {
     showToast(`Error: ${error.message}`, 'error');
   }
