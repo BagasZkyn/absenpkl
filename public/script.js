@@ -7,7 +7,7 @@ const accounts = [
     endpoint: "/api/bagas",
     cron: {
       jobId: "6056513",
-      apiKey: "wEQWzgMOWtDUoqf2ukcmFP3vhOVQATgDxObmHigmc74"
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
     }
   },
   {
@@ -16,7 +16,7 @@ const accounts = [
     endpoint: "/api/agung",
     cron: {
       jobId: "6056513",
-      apiKey: "wEQWzgMOWtDUoqf2ukcmFP3vhOVQATgDxObmHigmc74"
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
     }
   },
   {
@@ -25,7 +25,7 @@ const accounts = [
     endpoint: "/api/fahmi",
     cron: {
       jobId: "6056513",
-      apiKey: "wEQWzgMOWtDUoqf2ukcmFP3vhOVQATgDxObmHigmc74"
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
     }
   }
 ];
