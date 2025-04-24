@@ -1,166 +1,198 @@
+const CRON_API_URL = "https://api.cron-job.org";
 const accounts = [
-    {
-        id: "1",
-        name: "Bagas Zakyan",
-        email: "13636@gmail.com",
-        cronJobId: "6056513" // Ganti dengan ID sebenarnya
+  {
+    name: "Bagas Zakyan",
+    email: "13636@gmail.com",
+    endpoint: "/api/bagas",
+    cron: {
+      jobId: "6056513",
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
     }
+  },
+  {
+    name: "M Agung",
+    email: "13648@gmail.com",
+    endpoint: "/api/agung",
+    cron: {
+      jobId: "6056513",
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
+    }
+  },
+  {
+    name: "M Fahmi",
+    email: "13687@gmail.com",
+    endpoint: "/api/fahmi",
+    cron: {
+      jobId: "6056513",
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
+    }
+  },
+  {
+    name: "Andika Surya",
+    email: "13666@gmail.com",
+    endpoint: "/api/surya",
+    cron: {
+      jobId: "6056513",
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
+    }
+  }
 ];
 
-let currentJobId = null;
+async function getCronStatus(cronId, apiKey) {
+  try {
+    const response = await fetch(`${CRON_API_URL}/jobs/${cronId}`, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-async function fetchJobStatus(jobId) {
-    try {
-        const res = await fetch(`/api/cron-status?jobId=${jobId}`);
-        return await res.json();
-    } catch (error) {
-        console.error('Fetch error:', error);
-        return null;
-    }
-}
+    if (response.status === 401) throw new Error('API Key tidak valid');
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
-async function updateJob(jobId, data) {
-    try {
-        const res = await fetch(`/api/update-cron`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jobId, ...data })
-        });
-        return await res.json();
-    } catch (error) {
-        console.error('Update error:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-function showEditForm() {
-    const formHtml = `
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl p-6 w-full max-w-md">
-                <h3 class="text-xl font-bold mb-4">Edit Jadwal</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Jam (HH:MM)</label>
-                        <input type="time" id="edit-time1" class="w-full p-2 border rounded-lg" required>
-                        <input type="time" id="edit-time2" class="w-full p-2 border rounded-lg mt-2" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Hari Kerja</label>
-                        <select id="edit-days" multiple class="w-full p-2 border rounded-lg h-32">
-                            <option value="1">Senin</option>
-                            <option value="2">Selasa</option>
-                            <option value="3">Rabu</option>
-                            <option value="4">Kamis</option>
-                            <option value="5">Jumat</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mt-6 flex justify-end gap-3">
-                    <button onclick="this.closest('div').remove()" class="px-4 py-2 text-gray-500">
-                        Batal
-                    </button>
-                    <button onclick="saveSchedule()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-                        Simpan
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+    const data = await response.json();
     
-    const div = document.createElement('div');
-    div.innerHTML = formHtml;
-    document.body.appendChild(div);
-}
-
-async function saveSchedule() {
-    const time1 = document.getElementById('edit-time1').value;
-    const time2 = document.getElementById('edit-time2').value;
-    const days = Array.from(document.getElementById('edit-days').selectedOptions)
-        .map(opt => parseInt(opt.value));
-
-    if (!time1 || !time2 || days.length === 0) {
-        alert('Harap isi semua field');
-        return;
+    // Validasi berdasarkan struktur response baru
+    if (!data?.jobDetails) {
+      console.error('Response tidak valid:', data);
+      throw new Error('Struktur response API tidak valid');
     }
 
-    const schedule = `0 ${time1.split(':')[0]},${time2.split(':')[0]} * * ${days.join(',')}`;
-    
-    const result = await updateJob(currentJobId, { schedule });
-    if (result.success) {
-        alert('Jadwal berhasil diperbarui!');
-        location.reload();
-    } else {
-        alert('Error: ' + (result.error || 'Gagal memperbarui jadwal'));
-    }
+    return data;
+
+  } catch (error) {
+    console.error('Error API:', error);
+    document.getElementById('cron-error').textContent = error.message;
+    document.getElementById('cron-error').classList.remove('hidden');
+    setTimeout(() => document.getElementById('cron-error').classList.add('hidden'), 5000);
+    return null;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const accountList = document.getElementById('account-list');
+  const list = document.getElementById("account-list");
+  const icons = ['fa-user-graduate', 'fa-user-tie', 'fa-user-ninja'];
 
-    accounts.forEach(acc => {
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-2xl border-2 border-indigo-100 shadow-lg p-6 cursor-pointer hover:shadow-xl transition-all';
-        card.innerHTML = `
-            <div class="flex items-center gap-4">
-                <div class="bg-indigo-100 p-3 rounded-lg">
-                    <i class="fas fa-user text-indigo-600"></i>
+  accounts.forEach((acc, index) => {
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-2xl border-2 border-indigo-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer p-8 group hover:-translate-y-2 transform-gpu";
+    
+    const randomIcon = icons[index % icons.length];
+    
+    card.innerHTML = `
+      <div class="flex items-start mb-4">
+        <div class="bg-indigo-100 p-3 rounded-xl mr-4 transition-colors group-hover:bg-indigo-200">
+          <i class="fas ${randomIcon} text-2xl text-indigo-600"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-indigo-900">${acc.name}</h3>
+          <p class="text-indigo-500 mt-1">${acc.email}</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-sm bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+          <i class="fas fa-external-link-alt mr-2"></i>Detail
+        </span>
+      </div>
+    `;
+
+    let originalHTML = card.innerHTML;
+    let loading = false;
+
+    card.onclick = async () => {
+      if (loading) return;
+      loading = true;
+      
+      try {
+        // Tampilkan loading
+        card.querySelector('i').className = 'fas fa-spinner fa-spin';
+
+        const [endpointRes, cronData] = await Promise.all([
+          fetch(acc.endpoint).then(res => res.text()),
+          getCronStatus(acc.cron.jobId, acc.cron.apiKey)
+        ]);
+
+        // Update dialog content
+        document.getElementById("dialog-title").textContent = acc.name;
+        document.getElementById("dialog-email").textContent = `Email: ${acc.email}`;
+        document.getElementById("dialog-last").textContent = endpointRes;
+
+        // Update cron status
+        const statusContainer = document.getElementById("cron-status-container");
+        if (cronData?.jobDetails) {
+          const job = cronData.jobDetails;
+          const schedule = job.schedule;
+          
+          statusContainer.innerHTML = `
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Status Utama -->
+              <div class="p-4 bg-white rounded-lg">
+                <div class="flex items-center mb-2">
+                  <i class="fas ${job.enabled ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'} mr-2"></i>
+                  <span class="font-semibold">Status: ${job.enabled ? 'Aktif' : 'Nonaktif'}</span>
                 </div>
-                <div>
-                    <h3 class="text-xl font-bold text-indigo-900">${acc.name}</h3>
-                    <p class="text-indigo-500">${acc.email}</p>
+                <p class="text-sm text-gray-600 mt-1">${job.title || '-'}</p>
+              </div>
+              
+              <!-- Waktu Eksekusi -->
+              <div class="p-4 bg-white rounded-lg">
+                <div class="flex items-center mb-2">
+                  <i class="fas fa-clock text-blue-500 mr-2"></i>
+                  <span class="font-semibold">Jadwal</span>
                 </div>
+                <p class="text-sm text-gray-600">
+                  Next: ${new Date(job.nextExecution * 1000).toLocaleString()}<br>
+                  Last: ${job.lastExecution ? new Date(job.lastExecution * 1000).toLocaleString() : 'Belum pernah'}
+                </p>
+              </div>
+              
+              <!-- Detail Schedule -->
+              <div class="p-4 bg-white rounded-lg col-span-2">
+                <div class="flex items-center mb-2">
+                  <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
+                  <span class="font-semibold">Detail Jadwal</span>
+                </div>
+                <div class="text-sm text-gray-600">
+                  <p>Timezone: ${schedule.timezone}</p>
+                  <p>Menit: ${schedule.minutes.join(', ')}</p>
+                  <p>Jam: ${schedule.hours[0] === -1 ? 'Setiap jam' : schedule.hours.join(', ')}</p>
+                  <p>Hari: ${schedule.mdays[0] === -1 ? 'Setiap hari' : schedule.mdays.join(', ')}</p>
+                </div>
+              </div>
+              
+              <!-- Request Detail -->
+              <div class="p-4 bg-white rounded-lg col-span-2">
+                <div class="flex items-center mb-2">
+                  <i class="fas fa-link text-orange-500 mr-2"></i>
+                  <span class="font-semibold">Request Detail</span>
+                </div>
+                <div class="text-sm text-gray-600 break-all">
+                  <p>Method: ${job.requestMethod === 0 ? 'GET' : 'POST'}</p>
+                  <p>URL: ${job.url}</p>
+                  <p>Timeout: ${job.requestTimeout} detik</p>
+                  ${job.extendedData?.body ? `<p class="mt-2">Body: <br>${job.extendedData.body}</p>` : ''}
+                </div>
+              </div>
             </div>
-        `;
-
-        card.addEventListener('click', async () => {
-            currentJobId = acc.cronJobId;
-            const dialog = document.getElementById('detail-dialog');
-            
-            // Load job details
-            const jobData = await fetchJobStatus(acc.cronJobId);
-            
-            if (jobData?.jobDetails) {
-                document.getElementById('dialog-title').textContent = acc.name;
-                document.getElementById('dialog-email').textContent = acc.email;
-                document.getElementById('toggle-job').checked = jobData.jobDetails.enabled;
-                
-                // Parse schedule
-                const [_, hours, __, ___, days] = jobData.jobDetails.schedule.split(' ');
-                const times = hours.split(',').map(h => `${h.padStart(2, '0')}:00`);
-                const dayNames = days.split(',').map(d => ['Senin','Selasa','Rabu','Kamis','Jumat'][d-1]);
-                
-                document.getElementById('schedule-display').innerHTML = `
-                    <div>
-                        <p class="text-gray-600">Waktu:</p>
-                        <div class="flex gap-2 mt-1">
-                            ${times.map(t => `<span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">${t}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-gray-600">Hari:</p>
-                        <div class="flex flex-wrap gap-2 mt-1">
-                            ${dayNames.map(d => `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full">${d}</span>`).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                dialog.showModal();
-            }
-        });
-
-        accountList.appendChild(card);
-    });
-
-    // Toggle handler
-    document.getElementById('toggle-job').addEventListener('change', async (e) => {
-        const result = await updateJob(currentJobId, { enabled: e.target.checked });
-        if (!result.success) {
-            alert('Gagal memperbarui status: ' + (result.error || 'Unknown error'));
-            e.target.checked = !e.target.checked;
+          `;
+        } else {
+          statusContainer.innerHTML = `
+            <div class="p-4 bg-red-100 text-red-700 rounded-lg">
+              <i class="fas fa-exclamation-triangle mr-2"></i>
+              Gagal memuat data cron job
+            </div>
+          `;
         }
-    });
-});
 
-// Expose functions to global scope
-window.showEditForm = showEditForm;
-window.saveSchedule = saveSchedule;
+        document.getElementById("detail-dialog").showModal();
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      } finally {
+        loading = false;
+        card.querySelector('i').className = `fas ${randomIcon}`;
+      }
+    };
+
+    list.appendChild(card);
+  });
+});
