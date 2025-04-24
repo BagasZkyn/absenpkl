@@ -244,13 +244,26 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Fungsi edit jadwal
-function openScheduleEditor(jobId, apiKey, currentHours) {
+function openScheduleEditor(jobId, apiKey, currentSchedule) {
   document.getElementById('edit-jobId').value = jobId;
   document.getElementById('edit-apiKey').value = apiKey;
   
   const form = document.getElementById('schedule-form');
-  form.elements.morning.value = currentHours[0];
-  form.elements.afternoon.value = currentHours[1];
+  
+  // Pagi - ambil jadwal pertama
+  const [morningHour, morningMinute] = currentSchedule.hours.length > 0 ? 
+    [currentSchedule.hours[0], currentSchedule.minutes[0]] : 
+    [7, 0];
+    
+  // Sore - ambil jadwal kedua
+  const [afternoonHour, afternoonMinute] = currentSchedule.hours.length > 1 ? 
+    [currentSchedule.hours[1], currentSchedule.minutes[1]] : 
+    [16, 0];
+
+  form.elements['morning-hour'].value = morningHour;
+  form.elements['morning-minute'].value = morningMinute;
+  form.elements['afternoon-hour'].value = afternoonHour;
+  form.elements['afternoon-minute'].value = afternoonMinute;
   
   document.getElementById('schedule-dialog').showModal();
 }
