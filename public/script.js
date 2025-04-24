@@ -26,6 +26,15 @@ const accounts = [
       jobId: "6056513",
       apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
     }
+  },
+  {
+    name: "Andika Surya",
+    email: "13666@gmail.com",
+    endpoint: "/api/surya",
+    cron: {
+      jobId: "6056513",
+      apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE="
+    }
   }
 ];
 
