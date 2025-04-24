@@ -1,16 +1,24 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/public/index.html" }
+    {
+      "source": "/",
+      "destination": "/public/index.html"
+    }
   ],
   "cleanUrls": true,
-  "trailingSlash": false
-
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET" }
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET"
+        }
       ]
     }
   ]
