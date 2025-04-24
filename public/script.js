@@ -32,28 +32,31 @@ const accounts = [
 
 async function getCronStatus(cronId, apiKey) {
   try {
-    const response = await fetch(`${CRON_API_URL}/jobs/${cronId}`, {
+    const response = await fetch(`https://api.cron-job.org/jobs/${cronId}`, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       }
     });
 
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    // Handle 401 khusus
+    if (response.status === 401) {
+      throw new Error('Invalid API Key');
+    }
 
     const data = await response.json();
 
-    if (!data || data.kind !== "Response#Job") throw new Error("Invalid API response structure");
+    // Validasi response sesuai dokumentasi terbaru
+    if (!data || typeof data !== 'object' || !data.job) {
+      console.error('Invalid API structure:', data);
+      throw new Error('Invalid API response structure');
+    }
 
     return data;
 
   } catch (error) {
     console.error('Cron API Error:', error);
-    const errDiv = document.getElementById('cron-error');
-    errDiv.textContent = `Error: ${error.message}`;
-    errDiv.classList.remove('hidden');
-    setTimeout(() => errDiv.classList.add('hidden'), 5000);
-    return null;
+    throw error;
   }
 }
 
@@ -89,55 +92,56 @@ document.addEventListener("DOMContentLoaded", () => {
     card.onclick = async () => {
       if (loading) return;
       loading = true;
-      const originalHTML = card.innerHTML;
-
-      card.innerHTML = `
-        <div class="h-full flex items-center justify-center py-8">
-          <i class="fas fa-spinner fa-spin text-3xl text-indigo-600"></i>
-        </div>
-      `;
 
       try {
+        card.querySelector('i').className = 'fas fa-spinner fa-spin';
+
         const [endpointRes, cronStatus] = await Promise.allSettled([
           fetch(acc.endpoint).then(res => res.text()),
           getCronStatus(acc.cron.jobId, acc.cron.apiKey)
         ]);
 
-        if (endpointRes.status === 'fulfilled') {
-          document.getElementById("dialog-title").textContent = acc.name;
-          document.getElementById("dialog-email").textContent = `Email: ${acc.email}`;
-          document.getElementById("dialog-last").textContent = endpointRes.value;
-        } else {
-          throw new Error("Gagal mengambil data dari endpoint.");
+        if (endpointRes.status === 'rejected') {
+          throw new Error(`Endpoint error: ${endpointRes.reason}`);
         }
 
+        let cronData = null;
+        if (cronStatus.status === 'fulfilled' && cronStatus.value) {
+          cronData = cronStatus.value;
+        }
+
+        document.getElementById("dialog-last").textContent = endpointRes.value;
+
         const statusContainer = document.getElementById("cron-status-container");
-        if (cronStatus.status === 'fulfilled' && cronStatus.value?.job) {
-          const job = cronStatus.value.job;
+        if (cronData?.job) {
           statusContainer.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
               <div class="p-4 bg-white rounded-lg">
                 <div class="flex items-center mb-2">
-                  <i class="fas ${job.enabled ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'} mr-2"></i>
-                  <span class="font-semibold">Status: ${job.enabled ? 'Aktif' : 'Nonaktif'}</span>
+                  <i class="fas ${cronData.job.enabled ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'} mr-2"></i>
+                  <span class="font-semibold">Status: ${cronData.job.enabled ? 'Aktif' : 'Nonaktif'}</span>
                 </div>
-                <p class="text-sm text-gray-600 mt-1">${job.title}</p>
+                <p class="text-sm text-gray-600 mt-1">${cronData.job.title || 'No title'}</p>
               </div>
-              
+
               <div class="p-4 bg-white rounded-lg">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-history text-blue-500 mr-2"></i>
                   <span class="font-semibold">Eksekusi Terakhir</span>
                 </div>
-                <p class="text-sm text-gray-600">${new Date(job.lastExecutionDate).toLocaleString() || 'Belum pernah'}</p>
+                <p class="text-sm text-gray-600">
+                  ${cronData.job.lastExecutionDate ?
+                    new Date(cronData.job.lastExecutionDate).toLocaleString() :
+                    'Belum pernah'}
+                </p>
               </div>
-              
+
               <div class="p-4 bg-white rounded-lg col-span-2">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-link text-purple-500 mr-2"></i>
                   <span class="font-semibold">Target URL</span>
                 </div>
-                <code class="text-sm break-all">${job.url}</code>
+                <code class="text-sm break-all">${cronData.job.url || 'No URL'}</code>
               </div>
             </div>
           `;
@@ -151,15 +155,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         document.getElementById("detail-dialog").showModal();
-      } catch (e) {
-        alert(`Terjadi kesalahan: ${e.message}`);
-        console.error(e);
+      } catch (error) {
+        console.error('Error:', error);
+        alert(`Error: ${error.message}`);
+      } finally {
+        loading = false;
+        const icons = ['fa-user-graduate', 'fa-user-tie', 'fa-user-ninja'];
+        const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+        card.querySelector('i').className = `fas ${randomIcon}`;
       }
-
-      card.innerHTML = originalHTML;
-      loading = false;
     };
 
-    list.appendChild(card);
+    container.appendChild(card);
   });
 });
