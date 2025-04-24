@@ -5,12 +5,11 @@
     <title>Dashboard Absensi</title>
     <script defer src="script.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tambahkan Font Awesome untuk ikon -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tambahkan Google Fonts -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-      /* Terapkan font khusus */
       body { font-family: 'Poppins', sans-serif; }
     </style>
   </head>
@@ -35,6 +34,19 @@
             <p id="dialog-email" class="text-base text-indigo-500"></p>
           </div>
         </div>
+
+        <!-- Section status cron -->
+        <div class="bg-indigo-50 p-6 rounded-xl mb-6">
+          <div class="flex items-center mb-4 text-indigo-600">
+            <i class="fas fa-clock mr-2"></i>
+            <h3 class="font-semibold">Status Cron Job:</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-4" id="cron-status-container">
+            <!-- Info status cron akan dimuat di sini -->
+          </div>
+        </div>
+
+        <!-- Riwayat terakhir -->
         <div class="bg-indigo-50 p-6 rounded-xl max-h-[60vh] overflow-auto">
           <div class="flex items-center mb-4 text-indigo-600">
             <i class="fas fa-history mr-2"></i>
@@ -42,10 +54,11 @@
           </div>
           <pre class="text-base text-gray-800 whitespace-pre-wrap break-words font-medium" id="dialog-last"></pre>
         </div>
+
         <button onclick="document.getElementById('detail-dialog').close()" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
           <i class="fas fa-times mr-2"></i>Tutup Panel
         </button>
       </dialog>
     </div>
   </body>
-      </html>
+</html>
