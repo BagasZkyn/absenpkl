@@ -12,5 +12,12 @@
     "email": "13648@gmail.com",
     "endpoint": "/api/agung",
     "cronJobId": "6056513"
+  },
+  {
+    "id": "3",
+    "name": "M Fahmi",
+    "email": "13687@gmail.com",
+    "endpoint": "/api/fahmi",
+    "cronJobId": "6056513"
   }
 ]
