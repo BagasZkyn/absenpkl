@@ -4,5 +4,5 @@
 
 [[redirects]]
   from = "/api/absen"
-  to = "/.netlify/functions/absen"
+  to = "/.netlify/functions/bagas"
   status = 200
