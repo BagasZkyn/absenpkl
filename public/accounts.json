@@ -20,4 +20,11 @@
     "endpoint": "/api/fahmi",
     "cronJobId": "6056513"
   }
+  {
+    "id": "4",
+    "name": "Andika Surya",
+    "email": "13666@gmail.com",
+    "endpoint": "/api/surya",
+    "cronJobId": "6056513"
+  }
 ]
