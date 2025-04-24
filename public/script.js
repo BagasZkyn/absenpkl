@@ -205,6 +205,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 </p>
               </div>
             </div>
+
+            <div class="p-4 bg-white rounded-lg">
+      <div class="flex items-center mb-2">
+        <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
+        <span class="font-semibold">Hari Kerja</span>
+      </div>
+      <p class="text-sm text-gray-600">
+        Senin - Jumat
+      </p>
+    </div>
+    
+    <div class="p-4 bg-white rounded-lg">
+      <div class="flex items-center mb-2">
+        <i class="fas fa-clock text-blue-500 mr-2"></i>
+        <span class="font-semibold">Jam Absen</span>
+      </div>
+      <p class="text-sm text-gray-600">
+        Pagi: ${job.schedule.hours[0]}:${String(job.schedule.minutes[0]).padStart(2, '0')}<br>
+        Sore: ${job.schedule.hours[1]}:${String(job.schedule.minutes[1]).padStart(2, '0')}
+      </p>
+    </div>
           `;
         }
 
@@ -244,13 +265,26 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Fungsi edit jadwal
-function openScheduleEditor(jobId, apiKey, currentHours) {
+function openScheduleEditor(jobId, apiKey, currentSchedule) {
   document.getElementById('edit-jobId').value = jobId;
   document.getElementById('edit-apiKey').value = apiKey;
   
   const form = document.getElementById('schedule-form');
-  form.elements.morning.value = currentHours[0];
-  form.elements.afternoon.value = currentHours[1];
+  
+  // Pagi - ambil jadwal pertama
+  const [morningHour, morningMinute] = currentSchedule.hours.length > 0 ? 
+    [currentSchedule.hours[0], currentSchedule.minutes[0]] : 
+    [7, 0];
+    
+  // Sore - ambil jadwal kedua
+  const [afternoonHour, afternoonMinute] = currentSchedule.hours.length > 1 ? 
+    [currentSchedule.hours[1], currentSchedule.minutes[1]] : 
+    [16, 0];
+
+  form.elements['morning-hour'].value = morningHour;
+  form.elements['morning-minute'].value = morningMinute;
+  form.elements['afternoon-hour'].value = afternoonHour;
+  form.elements['afternoon-minute'].value = afternoonMinute;
   
   document.getElementById('schedule-dialog').showModal();
 }
@@ -262,16 +296,20 @@ document.getElementById('schedule-form').onsubmit = async (e) => {
   const formData = new FormData(e.target);
   const jobId = formData.get('jobId');
   const apiKey = formData.get('apiKey');
-  const morning = formData.get('morning');
-  const afternoon = formData.get('afternoon');
-
+  
   const schedule = {
     timezone: 'Asia/Jakarta',
-    minutes: [0],
-    hours: [parseInt(morning), parseInt(afternoon)],
-    mdows: [-1],
-    months: [-1],
-    mdays: [-1]
+    minutes: [
+      parseInt(formData.get('morning-minute')),
+      parseInt(formData.get('afternoon-minute'))
+    ],
+    hours: [
+      parseInt(formData.get('morning-hour')),
+      parseInt(formData.get('afternoon-hour'))
+    ],
+    mdows: [1,2,3,4,5], // 1=Senin, 5=Jumat
+    months: [-1], // -1 = semua bulan
+    mdays: [-1] // -1 = semua tanggal
   };
 
   try {
@@ -282,7 +320,7 @@ document.getElementById('schedule-form').onsubmit = async (e) => {
     if (result) {
       document.getElementById('schedule-dialog').close();
       showToast('Jadwal berhasil diupdate!', 'success');
-      setTimeout(() => location.reload(), 1000); // Refresh data
+      setTimeout(() => location.reload(), 1000);
     }
   } catch (error) {
     showToast(`Error: ${error.message}`, 'error');
