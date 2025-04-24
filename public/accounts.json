@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "name": "Bagas Zakyan",
+    "email": "13636@gmail.com",
+    "endpoint": "/api/bagas",
+    "cronJobId": "YOUR_CRON_JOB_ID"
+  },
+  {
+    "id": "2",
+    "name": "M Agung",
+    "email": "13648@gmail.com",
+    "endpoint": "/api/agung",
+    "cronJobId": "YOUR_CRON_JOB_ID_2"
+  }
+]
