@@ -21,11 +21,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   accounts.forEach((acc) => {
     const card = document.createElement("div");
-    card.className = "bg-white rounded-xl border border-indigo-200 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer p-6 min-h-[140px] flex flex-col justify-center";
+    card.className = "bg-white rounded-2xl border-2 border-indigo-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer p-8 group hover:-translate-y-2 transform-gpu";
+    
+    // Tambahkan ikon berbeda untuk variasi
+    const icons = ['fa-user-graduate', 'fa-user-tie', 'fa-user-ninja'];
+    const randomIcon = icons[Math.floor(Math.random() * icons.length)];
 
     card.innerHTML = `
-      <h3 class="text-xl font-bold text-indigo-700">${acc.name}</h3>
-      <p class="text-sm text-gray-500 mt-1">${acc.email}</p>
+      <div class="flex items-start mb-4">
+        <div class="bg-indigo-100 p-3 rounded-xl mr-4 transition-colors group-hover:bg-indigo-200">
+          <i class="fas ${randomIcon} text-2xl text-indigo-600"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-indigo-900">${acc.name}</h3>
+          <p class="text-indigo-500 mt-1">${acc.email}</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-sm bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+          <i class="fas fa-external-link-alt mr-2"></i>Detail
+        </span>
+      </div>
     `;
 
     let loading = false;
@@ -35,7 +51,13 @@ document.addEventListener("DOMContentLoaded", () => {
       loading = true;
       const originalHTML = card.innerHTML;
 
-      card.innerHTML += `<div class="mt-3 text-sm text-indigo-500 animate-pulse">Mengambil data...</div>`;
+      // Ganti dengan animasi loading yang lebih menarik
+      card.innerHTML = `
+        <div class="h-full flex items-center justify-center py-8">
+          <i class="fas fa-spinner fa-spin text-3xl text-indigo-600"></i>
+        </div>
+      `;
+      
       try {
         const res = await fetch(acc.endpoint);
         const text = await res.text();
