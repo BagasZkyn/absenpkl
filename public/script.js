@@ -10,14 +10,14 @@ const accounts = [
     name: "M Agung",
     email: "13648@gmail.com",
     endpoint: "/api/agung",
-    cronId: "CRON_ID_AGUNG",
+    cronId: "6056513",
     cronApiKey: "wEQWzgMOWtDUoqf2ukcmFP3vhOVQATgDxObmHigmc74="
   },
   {
     name: "M Fahmi",
     email: "13687@gmail.com",
     endpoint: "/api/fahmi",
-    cronId: "CRON_ID_FAHMI",
+    cronId: "6056513",
     cronApiKey: "wEQWzgMOWtDUoqf2ukcmFP3vhOVQATgDxObmHigmc74="
   }
 ];
