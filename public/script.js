@@ -28,6 +28,7 @@ const accounts = [
     }
   }
 ];
+
 async function getCronStatus(cronId, apiKey) {
   try {
     const response = await fetch(`${CRON_API_URL}/jobs/${cronId}`, {
@@ -42,12 +43,14 @@ async function getCronStatus(cronId, apiKey) {
 
     const data = await response.json();
     
+    // Validasi berdasarkan struktur response baru
     if (!data?.jobDetails) {
       console.error('Response tidak valid:', data);
       throw new Error('Struktur response API tidak valid');
     }
 
     return data;
+
   } catch (error) {
     console.error('Error API:', error);
     document.getElementById('cron-error').textContent = error.message;
@@ -90,28 +93,27 @@ document.addEventListener("DOMContentLoaded", () => {
     card.onclick = async () => {
       if (loading) return;
       loading = true;
-
+      
       try {
+        // Tampilkan loading
         card.querySelector('i').className = 'fas fa-spinner fa-spin';
 
-        const [endpointRes, cronStatus] = await Promise.allSettled([
+        const [endpointRes, cronData] = await Promise.all([
           fetch(acc.endpoint).then(res => res.text()),
           getCronStatus(acc.cron.jobId, acc.cron.apiKey)
         ]);
 
-        if (endpointRes.status === 'rejected') {
-          throw new Error(`Endpoint error: ${endpointRes.reason}`);
-        }
+        // Update dialog content
+        document.getElementById("dialog-title").textContent = acc.name;
+        document.getElementById("dialog-email").textContent = `Email: ${acc.email}`;
+        document.getElementById("dialog-last").textContent = endpointRes;
 
-        document.getElementById("dialog-last").textContent = endpointRes.value;
-
+        // Update cron status
         const statusContainer = document.getElementById("cron-status-container");
-        const cronData = cronStatus.status === 'fulfilled' ? cronStatus.value : null;
-
         if (cronData?.jobDetails) {
           const job = cronData.jobDetails;
           const schedule = job.schedule;
-
+          
           statusContainer.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
               <!-- Status Utama -->
@@ -145,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <p>Timezone: ${schedule.timezone}</p>
                   <p>Menit: ${schedule.minutes.join(', ')}</p>
                   <p>Jam: ${schedule.hours[0] === -1 ? 'Setiap jam' : schedule.hours.join(', ')}</p>
+                  <p>Hari: ${schedule.mdays[0] === -1 ? 'Setiap hari' : schedule.mdays.join(', ')}</p>
                 </div>
               </div>
               
@@ -155,9 +158,10 @@ document.addEventListener("DOMContentLoaded", () => {
                   <span class="font-semibold">Request Detail</span>
                 </div>
                 <div class="text-sm text-gray-600 break-all">
-                  <p>URL: ${job.url}</p>
                   <p>Method: ${job.requestMethod === 0 ? 'GET' : 'POST'}</p>
-                  ${job.extendedData?.body ? `<p>Body: ${job.extendedData.body}</p>` : ''}
+                  <p>URL: ${job.url}</p>
+                  <p>Timeout: ${job.requestTimeout} detik</p>
+                  ${job.extendedData?.body ? `<p class="mt-2">Body: <br>${job.extendedData.body}</p>` : ''}
                 </div>
               </div>
             </div>
@@ -166,21 +170,20 @@ document.addEventListener("DOMContentLoaded", () => {
           statusContainer.innerHTML = `
             <div class="p-4 bg-red-100 text-red-700 rounded-lg">
               <i class="fas fa-exclamation-triangle mr-2"></i>
-              Gagal memuat status cron job
+              Gagal memuat data cron job
             </div>
           `;
         }
 
         document.getElementById("detail-dialog").showModal();
       } catch (error) {
-        console.error('Error:', error);
         alert(`Error: ${error.message}`);
       } finally {
         loading = false;
-        card.querySelector('i').className = 'fas fa-user-graduate';
+        card.querySelector('i').className = `fas ${randomIcon}`;
       }
     };
 
-    container.appendChild(card);
+    list.appendChild(card);
   });
 });
