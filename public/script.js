@@ -1,4 +1,4 @@
-// script.js (Updated)
+// script.js
 const CRON_API_URL = "https://api.cron-job.org";
 const accounts = [
   {
@@ -96,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    let originalHTML = card.innerHTML;
     let loading = false;
 
     card.onclick = async () => {
@@ -118,17 +119,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const htmlDoc = parser.parseFromString(endpointRes, 'text/html');
         const rows = htmlDoc.querySelectorAll('table tr:not(:first-child)');
         
-        // Get today's date in format DD-MM-YYYY
+        // Get today's date
         const today = new Date();
-        const todayString = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+        const todayString = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth()+1).padStart(2, '0')}-${today.getFullYear()}`;
         
-        // Cek status absen hari ini
+        // Check today's status
         let todayStatus = { masuk: 'Belum Absen', pulang: 'Belum Absen' };
         rows.forEach(row => {
           const cells = row.querySelectorAll('td');
           const date = cells[0]?.textContent.trim();
           
-          if (date === todayString) {
+          if(date === todayString) {
             todayStatus.masuk = cells[1]?.textContent.trim() || 'Belum Absen';
             todayStatus.pulang = cells[2]?.textContent.trim() === '00:00:00' 
               ? 'Belum Absen' 
@@ -137,32 +138,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Format status box
-        const statusBox = document.getElementById("absen-status-container");
-        statusBox.innerHTML = `
+        const statusHTML = `
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-white p-4 rounded-lg border border-indigo-200">
               <div class="flex items-center mb-2">
                 <i class="fas ${todayStatus.masuk === 'Belum Absen' ? 'fa-times-circle text-red-500' : 'fa-check-circle text-green-500'} mr-2"></i>
                 <span class="font-semibold">Absen Masuk</span>
               </div>
-              <p class="text-sm text-gray-600">${todayStatus.masuk}</p>
+              <p class="text-sm ${todayStatus.masuk === 'Belum Absen' ? 'text-red-600' : 'text-gray-600'}">
+                ${todayStatus.masuk}
+              </p>
             </div>
-
+            
             <div class="bg-white p-4 rounded-lg border border-indigo-200">
               <div class="flex items-center mb-2">
-                <i class="fas ${todayStatus.pulang === 'Belum Absen' ? 'fa-times-circle text-red-500' : 'fa-check-circle text-green-500'} mr-2"></i>
+                <i class="fas ${todayStatus.pulang === 'Belum Absen' ? 'fa-clock text-orange-500' : 'fa-check-circle text-green-500'} mr-2"></i>
                 <span class="font-semibold">Absen Pulang</span>
               </div>
-              <p class="text-sm text-gray-600">${todayStatus.pulang}</p>
+              <p class="text-sm ${todayStatus.pulang === 'Belum Absen' ? 'text-orange-600' : 'text-gray-600'}">
+                ${todayStatus.pulang}
+              </p>
             </div>
           </div>
         `;
 
-        // Format riwayat absen
+        // Format history table
         let formattedHistory = '';
-        const tables = htmlDoc.querySelectorAll('table');
-        tables.forEach(table => {
-          table.classList.add('w-full', 'border-collapse', 'mb-6');
+        htmlDoc.querySelectorAll('table').forEach(table => {
+          table.classList.add('w-full', 'border-collapse', 'mb-6', 'history-table');
           table.querySelectorAll('th').forEach(th => {
             th.classList.add('bg-indigo-100', 'text-indigo-900', 'px-4', 'py-3', 'border', 'border-indigo-200', 'text-left');
           });
@@ -175,14 +178,18 @@ document.addEventListener("DOMContentLoaded", () => {
           formattedHistory += table.outerHTML;
         });
 
-        document.getElementById("dialog-last").innerHTML = formattedHistory || '<p class="text-indigo-500">Tidak ada riwayat absen</p>';
+        // Combine elements
+        document.getElementById("dialog-last").innerHTML = `
+          ${statusHTML}
+          ${formattedHistory || '<p class="text-center text-indigo-500 py-4">Tidak ada riwayat absen</p>'}
+        `;
 
-        // Cron job status
+        // Update cron status
         const statusContainer = document.getElementById("cron-status-container");
         if (cronData?.jobDetails) {
           const job = cronData.jobDetails;
           const schedule = job.schedule;
-
+          
           statusContainer.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
               <div class="p-4 bg-white rounded-lg">
@@ -192,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p class="text-sm text-gray-600 mt-1">${job.title || '-'}</p>
               </div>
-
+              
               <div class="p-4 bg-white rounded-lg">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-clock text-blue-500 mr-2"></i>
@@ -203,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   Last: ${job.lastExecution ? new Date(job.lastExecution * 1000).toLocaleString() : 'Belum pernah'}
                 </p>
               </div>
-
+              
               <div class="p-4 bg-white rounded-lg col-span-2">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
@@ -216,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <p>Hari: ${schedule.mdays[0] === -1 ? 'Setiap hari' : schedule.mdays.join(', ')}</p>
                 </div>
               </div>
-
+              
               <div class="p-4 bg-white rounded-lg col-span-2">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-link text-orange-500 mr-2"></i>
@@ -251,4 +258,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     list.appendChild(card);
   });
-});
+})
