@@ -1,3 +1,4 @@
+// script.js (Updated)
 const CRON_API_URL = "https://api.cron-job.org";
 const accounts = [
   {
@@ -111,13 +112,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("dialog-title").textContent = acc.name;
         document.getElementById("dialog-email").textContent = `Email: ${acc.email}`;
-        
-        // Format history response
+
+        // Parse history
         const parser = new DOMParser();
         const htmlDoc = parser.parseFromString(endpointRes, 'text/html');
-        const tables = htmlDoc.querySelectorAll('table');
+        const rows = htmlDoc.querySelectorAll('table tr:not(:first-child)');
         
+        // Get today's date in format DD-MM-YYYY
+        const today = new Date();
+        const todayString = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+        
+        // Cek status absen hari ini
+        let todayStatus = { masuk: 'Belum Absen', pulang: 'Belum Absen' };
+        rows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+          const date = cells[0]?.textContent.trim();
+          
+          if (date === todayString) {
+            todayStatus.masuk = cells[1]?.textContent.trim() || 'Belum Absen';
+            todayStatus.pulang = cells[2]?.textContent.trim() === '00:00:00' 
+              ? 'Belum Absen' 
+              : cells[2]?.textContent.trim();
+          }
+        });
+
+        // Format status box
+        const statusBox = document.getElementById("absen-status-container");
+        statusBox.innerHTML = `
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg border border-indigo-200">
+              <div class="flex items-center mb-2">
+                <i class="fas ${todayStatus.masuk === 'Belum Absen' ? 'fa-times-circle text-red-500' : 'fa-check-circle text-green-500'} mr-2"></i>
+                <span class="font-semibold">Absen Masuk</span>
+              </div>
+              <p class="text-sm text-gray-600">${todayStatus.masuk}</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-lg border border-indigo-200">
+              <div class="flex items-center mb-2">
+                <i class="fas ${todayStatus.pulang === 'Belum Absen' ? 'fa-times-circle text-red-500' : 'fa-check-circle text-green-500'} mr-2"></i>
+                <span class="font-semibold">Absen Pulang</span>
+              </div>
+              <p class="text-sm text-gray-600">${todayStatus.pulang}</p>
+            </div>
+          </div>
+        `;
+
+        // Format riwayat absen
         let formattedHistory = '';
+        const tables = htmlDoc.querySelectorAll('table');
         tables.forEach(table => {
           table.classList.add('w-full', 'border-collapse', 'mb-6');
           table.querySelectorAll('th').forEach(th => {
@@ -134,11 +177,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("dialog-last").innerHTML = formattedHistory || '<p class="text-indigo-500">Tidak ada riwayat absen</p>';
 
+        // Cron job status
         const statusContainer = document.getElementById("cron-status-container");
         if (cronData?.jobDetails) {
           const job = cronData.jobDetails;
           const schedule = job.schedule;
-          
+
           statusContainer.innerHTML = `
             <div class="grid grid-cols-2 gap-4">
               <div class="p-4 bg-white rounded-lg">
@@ -148,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p class="text-sm text-gray-600 mt-1">${job.title || '-'}</p>
               </div>
-              
+
               <div class="p-4 bg-white rounded-lg">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-clock text-blue-500 mr-2"></i>
@@ -159,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   Last: ${job.lastExecution ? new Date(job.lastExecution * 1000).toLocaleString() : 'Belum pernah'}
                 </p>
               </div>
-              
+
               <div class="p-4 bg-white rounded-lg col-span-2">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
@@ -172,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <p>Hari: ${schedule.mdays[0] === -1 ? 'Setiap hari' : schedule.mdays.join(', ')}</p>
                 </div>
               </div>
-              
+
               <div class="p-4 bg-white rounded-lg col-span-2">
                 <div class="flex items-center mb-2">
                   <i class="fas fa-link text-orange-500 mr-2"></i>
