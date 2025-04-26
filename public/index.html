@@ -1,9 +1,9 @@
+<!-- index.html (Updated) -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Dashboard Absensi</title>
-    <script src="config.js"></script>
     <script defer src="script.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,10 +21,10 @@
         <p class="text-xl text-indigo-500">Monitoring Harian Peserta PKL</p>
       </div>
 
+      <div id="cron-error" class="hidden fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg"></div>
       <div id="account-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 
-      <!-- Dialog Detail -->
-      <dialog id="detail-dialog" class="p-8 w-[95%] max-w-3xl rounded-2xl shadow-2xl bg-white border-2 border-indigo-100">
+      <dialog id="detail-dialog" class="p-8 w-[95%] max-w-3xl rounded-2xl shadow-2xl bg-white border-2 border-indigo-100 backdrop:bg-black/30">
         <div class="flex items-start mb-4">
           <div class="bg-indigo-100 p-3 rounded-lg mr-4">
             <i class="fas fa-user-circle text-3xl text-indigo-600"></i>
@@ -36,91 +36,24 @@
         </div>
 
         <div class="bg-indigo-50 p-6 rounded-xl mb-6">
+          <div class="flex items-center mb-4 text-indigo-600">
+            <i class="fas fa-clock mr-2"></i>
+            <h3 class="font-semibold">Status Cron Job:</h3>
+          </div>
           <div class="grid grid-cols-2 gap-4" id="cron-status-container"></div>
         </div>
 
         <div class="bg-indigo-50 p-6 rounded-xl max-h-[60vh] overflow-auto">
+          <div class="flex items-center mb-4 text-indigo-600">
+            <i class="fas fa-history mr-2"></i>
+            <h3 class="font-semibold">Riwayat 5 Hari Terakhir:</h3>
+          </div>
           <pre class="text-base text-gray-800 whitespace-pre-wrap break-words font-medium" id="dialog-last"></pre>
         </div>
 
-        <button onclick="document.getElementById('detail-dialog').close()" 
-                class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+        <button onclick="document.getElementById('detail-dialog').close()" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
           <i class="fas fa-times mr-2"></i>Tutup Panel
         </button>
-      </dialog>
-
-      <!-- Dialog Edit Jadwal -->
-      <dialog id="schedule-dialog" class="p-8 w-[95%] max-w-md rounded-2xl shadow-2xl bg-white border-2 border-indigo-100">
-  <h3 class="text-2xl font-bold text-indigo-900 mb-6">Edit Jadwal Absensi</h3>
-  <form id="schedule-form">
-    <input type="hidden" name="jobId" id="edit-jobId">
-    <input type="hidden" name="apiKey" id="edit-apiKey">
-    
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Jam Absen Pagi</label>
-            <div class="flex gap-2">
-              <input 
-                type="number" 
-                name="morning-hour" 
-                min="0" 
-                max="23" 
-                class="w-1/2 p-2 border rounded-lg"
-                placeholder="Jam"
-                required
-              >
-              <input 
-                type="number" 
-                name="morning-minute" 
-                min="0" 
-                max="59" 
-                class="w-1/2 p-2 border rounded-lg"
-                placeholder="Menit"
-                required
-              >
-            </div>
-          </div>
-          
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Jam Absen Sore</label>
-            <div class="flex gap-2">
-              <input 
-                type="number" 
-                name="afternoon-hour" 
-                min="0" 
-                max="23" 
-                class="w-1/2 p-2 border rounded-lg"
-                placeholder="Jam"
-                required
-              >
-              <input 
-                type="number" 
-                name="afternoon-minute" 
-                min="0" 
-                max="59" 
-                class="w-1/2 p-2 border rounded-lg"
-                placeholder="Menit"
-                required
-              >
-            </div>
-          </div>
-
-          <div class="mb-4 bg-blue-50 p-3 rounded-lg">
-            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-            <span class="text-sm text-blue-600">Jadwal akan berjalan Senin-Jumat saja</span>
-          </div>
-
-          <div class="flex justify-end gap-3">
-            <button type="button" 
-                    onclick="document.getElementById('schedule-dialog').close()"
-                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
-              Batal
-            </button>
-            <button type="submit" 
-                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">
-              Simpan Perubahan
-            </button>
-          </div>
-        </form>
       </dialog>
     </div>
   </body>
