@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import { CookieJar } from 'tough-cookie';
 import fetchCookie from 'fetch-cookie';
-import { parse } from 'node-html-parser';
 
 const jar = new CookieJar();
 const fetchWithCookies = fetchCookie(fetch, jar);
@@ -27,7 +26,7 @@ export default async function handler(req, res) {
       return res.status(401).send('Login gagal. Cek email/password.');
     }
 
-    // Step 2: Ambil History Absen
+    // Step 2: Get History
     const historyRes = await fetchWithCookies('https://absenpkl.stmbksimo.com/sw-proses?action=history', {
       method: 'POST',
       headers: {
@@ -44,35 +43,9 @@ export default async function handler(req, res) {
     });
 
     const historyText = await historyRes.text();
-    
-    // Step 3: Parse HTML untuk ambil absen masuk dan pulang terbaru
-    const root = parse(historyText);
-    const rows = root.querySelectorAll('tr');
-
-    if (rows.length < 2) {
-      return res.status(404).send('Data history tidak ditemukan.');
-    }
-
-    // Ambil baris pertama setelah header
-    const firstDataRow = rows[1];
-    const columns = firstDataRow.querySelectorAll('td');
-
-    if (columns.length < 5) {
-      return res.status(404).send('Format data history tidak sesuai.');
-    }
-
-    const tanggal = columns[1]?.innerText.trim();
-    const absenMasuk = columns[2]?.innerText.trim();
-    const absenPulang = columns[3]?.innerText.trim();
-
-    res.status(200).json({
-      tanggal,
-      absenMasuk,
-      absenPulang
-    });
-
+    res.status(200).send(`History response: ${historyText}`);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Terjadi kesalahan saat mengambil history absen.');
+    res.status(500).send('Terjadi kesalahan saat mengambil history.');
   }
 }
