@@ -1,4 +1,3 @@
-// script.js (Updated)
 const CRON_API_URL = "https://api.cron-job.org";
 const accounts = [
   {
@@ -96,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    let originalHTML = card.innerHTML;
     let loading = false;
 
     card.onclick = async () => {
@@ -113,7 +111,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("dialog-title").textContent = acc.name;
         document.getElementById("dialog-email").textContent = `Email: ${acc.email}`;
-        document.getElementById("dialog-last").textContent = endpointRes;
+        
+        // Format history response
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(endpointRes, 'text/html');
+        const tables = htmlDoc.querySelectorAll('table');
+        
+        let formattedHistory = '';
+        tables.forEach(table => {
+          table.classList.add('w-full', 'border-collapse', 'mb-6');
+          table.querySelectorAll('th').forEach(th => {
+            th.classList.add('bg-indigo-100', 'text-indigo-900', 'px-4', 'py-3', 'border', 'border-indigo-200', 'text-left');
+          });
+          table.querySelectorAll('td').forEach(td => {
+            td.classList.add('px-4', 'py-3', 'border', 'border-indigo-200', 'text-gray-700');
+          });
+          table.querySelectorAll('tr').forEach(tr => {
+            tr.classList.add('hover:bg-indigo-50', 'transition-colors');
+          });
+          formattedHistory += table.outerHTML;
+        });
+
+        document.getElementById("dialog-last").innerHTML = formattedHistory || '<p class="text-indigo-500">Tidak ada riwayat absen</p>';
 
         const statusContainer = document.getElementById("cron-status-container");
         if (cronData?.jobDetails) {
