@@ -39,7 +39,7 @@ const accounts = [
   {
     name: "Nauval Fadil",
     email: "13157@gmail.com",
-    endpoint: "/api/logger/testlog?user=naufal",
+    endpoint: "/api/logger/testlog?user=nauval",
     cron: {
       masuk: { jobId: "6070747", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070771", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
