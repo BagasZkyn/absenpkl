@@ -1,7 +1,12 @@
 const endpoints = [
-  '/api/bagas',
-  '/api/agung',
-  '/api/fahmi'
+  '/api/absen/bagas',
+  '/api/absen/agung',
+  '/api/absen/fahmi',
+  '/api/absen/nauval',
+  '/api/absen/fadil',
+  '/api/absen/surya',
+  '/api/absen/vino',
+  '/api/absen/azka'
   // Tambahkan endpoint lainnya di sini
 ];
 
