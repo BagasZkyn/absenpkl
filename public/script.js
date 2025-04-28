@@ -3,7 +3,7 @@ const accounts = [
   {
     name: "Bagas Zakyan",
     email: "13636@gmail.com",
-    endpoint: "/api/logger/bagas",
+    endpoint: "/api/logger/testlog?user=bagas",
     cron: {
       masuk: { jobId: "6070729", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070763", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -12,7 +12,7 @@ const accounts = [
   {
     name: "M Agung",
     email: "13648@gmail.com",
-    endpoint: "/api/logger/agung",
+    endpoint: "/api/logger/testlog?user=agung",
     cron: {
       masuk: { jobId: "6070730", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070764", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -21,7 +21,7 @@ const accounts = [
   {
     name: "Andika Surya",
     email: "13666@gmail.com",
-    endpoint: "/api/logger/surya",
+    endpoint: "/api/logger/testlog?user=surya",
     cron: {
       masuk: { jobId: "6070744", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070774", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -30,7 +30,7 @@ const accounts = [
   {
     name: "M Fadilla",
     email: "13686@gmail.com",
-    endpoint: "/api/logger/fadil",
+    endpoint: "/api/logger/testlog?user=fadil",
     cron: {
       masuk: { jobId: "6070741", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070775", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -39,7 +39,7 @@ const accounts = [
   {
     name: "Nauval Fadil",
     email: "13157@gmail.com",
-    endpoint: "/api/logger/nauval",
+    endpoint: "/api/logger/testlog?user=naufal",
     cron: {
       masuk: { jobId: "6070747", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070771", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -48,7 +48,7 @@ const accounts = [
   {
     name: "M Fahmi",
     email: "13687@gmail.com",
-    endpoint: "/api/logger/fahmi",
+    endpoint: "/api/logger/testlog?user=fahmi",
     cron: {
       masuk: { jobId: "6070749", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070772", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -57,7 +57,7 @@ const accounts = [
   {
     name: "Hasta Adhitama",
     email: "13643@gmail.com",
-    endpoint: "/api/logger/hasta",
+    endpoint: "/api/logger/testlog?user=hasta",
     cron: {
       masuk: { jobId: "6070737", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070767", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -66,7 +66,7 @@ const accounts = [
   {
     name: "Andhika Eko",
     email: "13664@gmail.com",
-    endpoint: "/api/logger/eko",
+    endpoint: "/api/logger/testlog?user=eko",
     cron: {
       masuk: { jobId: "6070739", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070769", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -75,7 +75,7 @@ const accounts = [
   {
     name: "Azka MF",
     email: "13706@gmail.com",
-    endpoint: "/api/logger/azka",
+    endpoint: "/api/logger/testlog?user=azka",
     cron: {
       masuk: { jobId: "6070750", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070777", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
@@ -84,7 +84,7 @@ const accounts = [
   {
     name: "Vino Alimazt",
     email: "13734@gmail.com",
-    endpoint: "/api/logger/vino",
+    endpoint: "/api/logger/testlog?user=vino",
     cron: {
       masuk: { jobId: "6070758", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" },
       pulang: { jobId: "6070776", apiKey: "8FgWf4X2k+tXfq5wHlVintm6zBokMuob0AHPo5FabPE=" }
